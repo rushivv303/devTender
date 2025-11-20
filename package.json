@@ -1,0 +1,19 @@
+{
+  "name": "devtender",
+  "version": "1.0.0",
+  "description": "tender for devs",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon src/app.js"
+  },
+  "keywords": [
+    "nodejs",
+    "javascript"
+  ],
+  "author": "rushikesh vaidya",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "nodemon": "^3.1.11"
+  }
+}
