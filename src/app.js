@@ -1,6 +1,9 @@
 const express = require("express");
 const connectDB = require('./config/database')
 const app = express();
+const User = require('./models/user');
+
+app.use(express.json());
 
 // app.use("/user",
 //     (req,res,next)=>{
@@ -9,6 +12,86 @@ const app = express();
 //         res.send("lets check server route on port 7777");
 //     },
 // )
+
+// app.post("/signup", async (req, res)=>{
+//     const user = new User({
+//         firstName : "Virat",
+//         lastName : "Sharma",
+//         emailId : "virat.sharam@wrogn.in",
+//         password : "Virat@8989"
+//     });
+
+
+//     await user.save();
+//     res.send("User Added successfully");
+// });
+
+app.post("/signup",async (req,res)=>{
+    console.log(req.body);
+    const user = new User(req.body);
+    await user.save();
+    res.send("User added successfully");
+});
+
+//get user by emailId
+app.get("/user",async(req,res)=>{
+    const userEmail = req.body.emailId;
+
+    try{
+        const user = await User.findOne({"emailId":userEmail});
+        if(!user){
+            res.status(404).send("User not found");
+            return;
+        }
+        res.status(200).send(user);
+        return;
+    }catch(err){
+        res.status(400).send("something went to wrong");
+        return;
+    }
+});
+
+// get feed all user find()
+app.get("/feed", async(req,res)=>{
+    try{
+        const allUser = await User.find({});
+        
+        if(!allUser){
+            res.status(404).send("Users not found");
+            return;
+        }else{
+            res.status(200).send(allUser);
+        }
+    }catch(err){
+        res.status(400).send("Something went to wrong");
+    }
+})
+
+//delete user
+app.delete("/user",async(req,res)=>{
+    const emailId = req.body.emailId;
+    const userId = req.body.userId;
+    try{
+        const user = await User.findOneAndDelete({"_id" : userId});
+        res.send("user deleted successfully");
+    }catch(err){
+        res.status(400).send("Something went to wrong");
+    }
+
+});
+
+//update user
+app.patch("/user",async(req,res)=>{
+    const userId = req.body.userId;
+    const data = req.body;
+    try{
+        const user = await User.findOneAndUpdate({"_id":userId},data);
+        res.send("User update successfully");
+    }catch(err){
+        res.status(400).send("Something went to wrong");
+    }
+})
+
 
 connectDB()
 .then(()=>{
