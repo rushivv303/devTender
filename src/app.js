@@ -3,6 +3,8 @@ const connectDB = require('./config/database')
 const app = express();
 const User = require('./models/user');
 const validator = require("validator");
+const bcrypt = require("bcrypt");
+const {validateSignUpData} = require('./utils/validation');
 
 app.use(express.json());
 
@@ -29,12 +31,37 @@ app.use(express.json());
 
 app.post("/signup",async (req,res)=>{
 
+    //validate data
+    validateSignUpData(req);
+    const {firstName, lastName, emailId, password} = req.body;
 
+    //encrypt the password
+    const passwordHash = await bcrypt.hash(password,10);
 
-    const user = new User(req.body);
+    const user = new User({
+        firstName, lastName, emailId, password:passwordHash
+    });
     await user.save();
     res.send("User added successfully");
 });
+
+app.post("/login",async(req,res)=>{
+    const {emailId,password} = req.body;
+
+    const user = await User.findOne({emailId:emailId});
+
+    if(!user){
+        throw new Error("Invalid creaditial");
+    }
+
+    const isPasswordVaild = await bcrypt.compare(password, user.password);
+
+    if(isPasswordVaild){
+        res.send("Login successfull");
+    }else{
+        res.send("Invalid crediential");
+    }
+})
 
 //get user by emailId
 app.get("/user",async(req,res)=>{
