@@ -5,8 +5,12 @@ const User = require('./models/user');
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const {validateSignUpData} = require('./utils/validation');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
+const {userAuth} = require('./middlewares/auth');
 
 app.use(express.json());
+app.use(cookieParser());
 
 // app.use("/user",
 //     (req,res,next)=>{
@@ -48,18 +52,43 @@ app.post("/signup",async (req,res)=>{
 app.post("/login",async(req,res)=>{
     const {emailId,password} = req.body;
 
-    const user = await User.findOne({emailId:emailId});
+    try{
+        const user = await User.findOne({emailId:emailId});
 
-    if(!user){
-        throw new Error("Invalid creaditial");
+        if(!user){
+            throw new Error("Invalid creaditial");
+        }
+
+        // const isPasswordVaild = await bcrypt.compare(password, user.password);
+        const isPasswordVaild = await user.validatePassword(password);
+
+        if(isPasswordVaild){
+            // const token = await jwt.sign({'_id':user._id},"secret_dev_key_007", {
+                // expiresIn : "7d",
+            // });
+
+            const token = await user.getJWT();
+
+            res.cookie('token',token,{
+                expire : new Date(Date.now + 8 * 3600000)
+            });
+            res.send("Login successfull");
+        }else{
+            res.send("Invalid crediential");
+        }
+
+     }catch(err){
+        throw new Error('ERROR: ' + err.message);
     }
+})
 
-    const isPasswordVaild = await bcrypt.compare(password, user.password);
+app.get('/profile',userAuth, async(req,res)=>{
+    try{
+       const user = req.user
 
-    if(isPasswordVaild){
-        res.send("Login successfull");
-    }else{
-        res.send("Invalid crediential");
+        res.send(user);
+    }catch(err){
+        throw new Error("somthing went to worng"+err);
     }
 })
 
