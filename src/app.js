@@ -1,16 +1,23 @@
 const express = require("express");
 const connectDB = require('./config/database')
 const app = express();
-const User = require('./models/user');
+// const User = require('./models/user');
 const validator = require("validator");
-const bcrypt = require("bcrypt");
-const {validateSignUpData} = require('./utils/validation');
+// const bcrypt = require("bcrypt");
 const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken');
-const {userAuth} = require('./middlewares/auth');
+// const jwt = require('jsonwebtoken');
+// const {userAuth} = require('./middlewares/auth');
 
 app.use(express.json());
 app.use(cookieParser());
+
+const authRouter = require('./routes/auth');
+const profileRouter = require('./routes/profile');
+const requestRouter = require('./routes/request');
+
+app.use('/', authRouter);
+app.use('/', profileRouter);
+app.use('/', requestRouter); 
 
 // app.use("/user",
 //     (req,res,next)=>{
@@ -33,7 +40,7 @@ app.use(cookieParser());
 //     res.send("User Added successfully");
 // });
 
-app.post("/signup",async (req,res)=>{
+/* app.post("/signup",async (req,res)=>{
 
     //validate data
     validateSignUpData(req);
@@ -47,9 +54,9 @@ app.post("/signup",async (req,res)=>{
     });
     await user.save();
     res.send("User added successfully");
-});
+}); */
 
-app.post("/login",async(req,res)=>{
+/* app.post("/login",async(req,res)=>{
     const {emailId,password} = req.body;
 
     try{
@@ -80,9 +87,9 @@ app.post("/login",async(req,res)=>{
      }catch(err){
         throw new Error('ERROR: ' + err.message);
     }
-})
+}) */
 
-app.get('/profile',userAuth, async(req,res)=>{
+/* app.get('/profile',userAuth, async(req,res)=>{
     try{
        const user = req.user
 
@@ -90,7 +97,7 @@ app.get('/profile',userAuth, async(req,res)=>{
     }catch(err){
         throw new Error("somthing went to worng"+err);
     }
-})
+}) */
 
 //get user by emailId
 app.get("/user",async(req,res)=>{
