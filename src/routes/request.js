@@ -32,7 +32,7 @@ requestRouter.post('/request/send/:status/:toUserId',
             });
     
             if(existingConnectionRequest){
-                return res.status(400).status({message : "connection request alerady exists !!"});
+                return res.status(401).status({message : "connection request alerady exists !!"});
             }
     
             const connectionRequest = new ConnectionRequest({
@@ -51,9 +51,42 @@ requestRouter.post('/request/send/:status/:toUserId',
                 data,
             })
         }catch(err){
-            res.status(400).send("ERROR: " + err.message);
+            res.status(404).send("ERROR: " + err.message);
         }
     }
 );
+
+requestRouter.post(
+    '/request/reviewe/:status/:requestId',
+    userAuth,
+    async (req,res)=>{
+        try{
+            const loggedInUser = req.user;
+            const {status, requestId} = req.params;
+
+            const allowedStatus = ['accepted','rejected'];
+            if(!allowedStatus.includes(status)){
+                return res.status(400).json({message:"Status not allowed"});
+            }
+            const connectionRequest = await ConnectionRequest.findOne({
+                _id: requestId,
+                toUserId: loggedInUser._id,
+                status: "interested"
+            });
+
+            if(!connectionRequest){
+                return res.status(404).json({message: "Connection request not found"});
+            }
+
+            connectionRequest.status = status;
+
+            const data = await connectionRequest.save();
+
+            res.json({message:"coonection request" + status,data});
+        }catch(err){
+            res.status(400).send("ERROR:" + err.message);
+        }
+    }
+)
 
 module.exports = requestRouter;

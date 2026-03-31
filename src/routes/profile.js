@@ -9,7 +9,7 @@ profileRouter.get('/profile/view',userAuth, async(req,res)=>{
 
         res.send(user);
     }catch(err){
-        throw new Error("ERROR: "+err.message);
+        res.send("ERROR: "+err.message);
     }
 });
 
