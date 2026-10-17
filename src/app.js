@@ -5,9 +5,15 @@ const app = express();
 const validator = require("validator");
 // const bcrypt = require("bcrypt");
 const cookieParser = require('cookie-parser');
+const cors = require("cors");
+
 // const jwt = require('jsonwebtoken');
 // const {userAuth} = require('./middlewares/auth');
 
+app.use(cors({
+    origin:"http://localhost:5173",
+    credentials:true
+}));
 app.use(express.json());
 app.use(cookieParser());
 

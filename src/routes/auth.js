@@ -32,7 +32,8 @@ authRouter.post("/login",async(req,res)=>{
         const user = await User.findOne({emailId:emailId});
 
         if(!user){
-            throw new Error("Invalid creaditial");
+            // throw new Error("Invalid creaditial");
+            return res.status(400).send("Invalid crediential");
         }
 
         // const isPasswordVaild = await bcrypt.compare(password, user.password);
@@ -44,9 +45,10 @@ authRouter.post("/login",async(req,res)=>{
             res.cookie('token',token,{
                 expire : new Date(Date.now + 8 * 3600000)
             });
-            res.send("Login successfull");
+            res.send(user);
         }else{
-            res.send("Invalid crediential");
+            // res.send("Invalid crediential");
+            return res.status(400).send("Invalid crediential");
         }
 
     }catch(err){

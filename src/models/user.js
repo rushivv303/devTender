@@ -41,6 +41,11 @@ const userSchema = new mongoose.Schema({
         type : Number,
 
     },
+    about : {
+        type : String,
+        default : "Try to say somthing"
+
+    },
     gender : {
         type : String,
         enum : {
@@ -53,9 +58,9 @@ const userSchema = new mongoose.Schema({
         //     }
         // }
     },
-    imageUrl : {
+    photoUrl : {
         type : String,
-        default : "https://www.freepik.com/free-photos-vectors/default-user",
+        default : "https://img.magnific.com/free-vector/young-man-with-glasses-avatar_1308-175763.jpg?t=st=1783343560~exp=1783347160~hmac=a90a2e2f0a26b63ac0ea494e82b9be8125b8df5f9a1ae12cca137e8ad3f4165b&w=1480",
         validate(value){
             if(!validator.isURL(value)){
                 throw new Error("Invalid image url");
